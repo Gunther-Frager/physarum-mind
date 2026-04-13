@@ -1,0 +1,5 @@
+Plaintext
+groq
+sentence-transformers
+requests
+networkx
