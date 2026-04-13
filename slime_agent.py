@@ -19,6 +19,12 @@ genai.configure(api_key=GEMINI_API_KEY)
 model_gemini = genai.GenerativeModel('gemini-1.5-flash')
 embed_model = SentenceTransformer(MODELO_EMBEDDING)
 
+# Convert float32 arrays to Python floats
+if isinstance(data, np.ndarray):
+    data = data.astype(float).tolist()
+elif isinstance(data, np.float32):
+    data = float(data)
+
 def cargar_notas():
     archivos = glob.glob(f"{NOTAS_PATH}/*.md")
     notas = {}
