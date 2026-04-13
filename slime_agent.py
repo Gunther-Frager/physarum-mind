@@ -19,11 +19,17 @@ genai.configure(api_key=GEMINI_API_KEY)
 model_gemini = genai.GenerativeModel('gemini-1.5-flash')
 embed_model = SentenceTransformer(MODELO_EMBEDDING)
 
-# Convert float32 arrays to Python floats
-if isinstance(data, np.ndarray):
-    data = data.astype(float).tolist()
-elif isinstance(data, np.float32):
-    data = float(data)
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super().default(obj)
+# Use when serializing:
+#json.dumps(your_data, cls=NumpyEncoder)
 
 def cargar_notas():
     archivos = glob.glob(f"{NOTAS_PATH}/*.md")
@@ -42,7 +48,7 @@ def cargar_grafo():
 
 def guardar_datos(grafo):
     with open(GRAFO_FILE, 'w') as f:
-        json.dump(grafo, f, indent=4)
+        json.dump(grafo, f, indent=4, cls=NumpyEncoder)
 
 def sintetizar_idea(nota_a_nombre, nota_a_cont, nota_b_nombre, nota_b_cont):
     prompt = f"""
