@@ -1,0 +1,43 @@
+name: Latido del Slime Mold
+
+on:
+  schedule:
+    # Se ejecuta cada 6 horas. Puedes cambiarlo a '0 * * * *' para cada hora.
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Esto permite que tú lo actives manualmente con un botón
+
+jobs:
+  think:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write # Permiso crucial para que el agente pueda escribir notas
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Instalar dependencias
+        run: |
+          pip install google-generativeai sentence-transformers numpy
+
+      - name: Ejecutar Agente de Pensamiento
+        env:
+          # Aquí es donde el script lee las llaves que guardaste en "Secrets"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python slime_agent.py
+
+      - name: Guardar cambios y nuevas notas
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Slime Mold Agent"
+          git add .
+          # El comando siguiente evita que el flujo falle si no hay cambios nuevos
+          git commit -m "El Slime Mold ha crecido: nuevas conexiones e ideas" || echo "No hay cambios para commitear"
+          git push

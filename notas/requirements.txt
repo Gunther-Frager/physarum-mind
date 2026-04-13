@@ -1,5 +1,3 @@
-Plaintext
-groq
+google-generativeai
 sentence-transformers
-requests
-networkx
+numpy
