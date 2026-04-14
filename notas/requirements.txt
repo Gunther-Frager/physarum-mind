@@ -1,3 +1,5 @@
-google-generativeai
-sentence-transformers
-numpy
+google-generativeai>=0.3.0     # Gemini API para síntesis IA
+sentence-transformers>=2.2.0   # Embeddings semánticos (384-dim)
+numpy>=1.24.0                  # Matemáticas y álgebra lineal
+PyGithub>=1.59                 # GitHub API para importar/publicar issues
+requests>=2.31.0               # HTTP requests

@@ -2,9 +2,13 @@ name: Latido del Slime Mold
 
 on:
   schedule:
-    # Se ejecuta cada 6 horas. Puedes cambiarlo a '0 * * * *' para cada hora.
-    - cron: '0 */6 * * *'
-  workflow_dispatch: # Esto permite que tú lo actives manualmente con un botón
+    # ⏰ FRECUENCIA DE EJECUCIÓN - Edita el cron aquí:
+    # '0 * * * *'     → Cada hora (24 ciclos/día) - MÁS PENSAMIENTO
+    # '0 */2 * * *'   → Cada 2 horas (12 ciclos/día)
+    # '0 */6 * * *'   → Cada 6 horas (4 ciclos/día)
+    # '0 */12 * * *'  → Cada 12 horas (2 ciclos/día)
+    - cron: '0 * * * *'
+  workflow_dispatch: # Permite activar manualmente con un botón en GitHub
 
 jobs:
   think:
@@ -26,18 +30,34 @@ jobs:
         run: |
           pip install google-generativeai sentence-transformers numpy
 
-      - name: Ejecutar Agente de Pensamiento
+      - name: Ejecutar Agente de Pensamiento Autónomo
         env:
-          # Aquí es donde el script lee las llaves que guardaste en "Secrets"
+          # Variables de entorno con tokens de seguridad (configurados en GitHub Secrets)
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Para leer/escribir issues
         run: python slime_agent.py
 
-      - name: Guardar cambios y nuevas notas
+      - name: Procesar Issues como Nuevas Notas
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python github_issues_manager.py --import
+        continue-on-error: true  # No falla el workflow si no hay issues
+
+      - name: Publicar Síntesis Interesantes como Issues
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python github_issues_manager.py --publish
+        continue-on-error: true  # No falla el workflow si no hay síntesis nuevas
+
+      - name: Generar Dashboard Web
+        run: python dashboard_generator.py
+        continue-on-error: true
+
+      - name: Guardar cambios, notas nuevas y síntesis
         run: |
           git config --local user.email "action@github.com"
-          git config --local user.name "Slime Mold Agent"
+          git config --local user.name "🧠 Slime Mold Agent"
           git add .
-          # El comando siguiente evita que el flujo falle si no hay cambios nuevos
-          git commit -m "El Slime Mold ha crecido: nuevas conexiones e ideas" || echo "No hay cambios para commitear"
+          git commit -m "🌱 Ciclo de pensamiento completado: nuevas conexiones, síntesis e ideas" || echo "✓ Sin cambios nuevos"
           git push
