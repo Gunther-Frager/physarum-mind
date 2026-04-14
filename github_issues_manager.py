@@ -239,6 +239,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--import",
+        dest="import_mode",  # <--- Agregamos esto para evitar la palabra reservada
         action="store_true",
         help="Importar ideas desde issues con label 'idea'"
     )
@@ -250,13 +251,9 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    if args.import:
+    # Cambiamos args.import por args.import_mode
+    if args.import_mode: 
         importar_ideas_desde_issues()
     
     if args.publish:
         publicar_sintesis_como_issues()
-    
-    if not args.import and not args.publish:
-        print("⚠️  Especifica --import o --publish")
-        print(f"Uso: {sys.argv[0]} --import  # Importar ideas")
-        print(f"     {sys.argv[0]} --publish # Publicar síntesis")
