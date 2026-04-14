@@ -133,7 +133,7 @@ Settings → Pages → "Your site is live at..."
 
 ```python
 # Biología del Sistema
-EVAPORATION_RATE = 0.95
+EVAPORATION_RATE = 0.91
 # ├─ 0.90 = Olvido rápido (más creativo, menos memoria)
 # └─ 0.99 = Olvido lento (más memoria, menos novedad)
 

@@ -16,6 +16,7 @@ jobs:
     
     permissions:
       contents: write # Permiso crucial para que el agente pueda escribir notas
+      issues: write
 
     steps:
       - name: Descargar repositorio
