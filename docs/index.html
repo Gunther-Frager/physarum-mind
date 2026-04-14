@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 Physarum-Mind Dashboard</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2a5298;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.95em;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            color: #2a5298;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #2a5298;
+            padding-bottom: 10px;
+        }
+        
+        #network {
+            width: 100%;
+            height: 500px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .conexion {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #f5f5f5;
+            border-left: 4px solid #2a5298;
+            border-radius: 4px;
+        }
+        
+        .conexion-nombre {
+            flex: 1;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .conexion-fuerza {
+            background: #2a5298;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        
+        .timestamp {
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 8px 12px;
+            background: #4caf50;
+            color: white;
+            border-radius: 4px;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+        
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 Physarum-Mind Dashboard</h1>
+            <p>Visualización en tiempo real de la red autónoma de pensamiento</p>
+            <div class="status">✓ Sistema Activo - Ciclo Cada Hora</div>
+        </header>
+        
+        <div class="grid">
+            <div class="card">
+                <div class="stat-label">Nodos Activos</div>
+                <div class="stat-number">0</div>
+                <small>notas en la red</small>
+            </div>
+            <div class="card">
+                <div class="stat-label">Conexiones</div>
+                <div class="stat-number">1</div>
+                <small>enlaces entre ideas</small>
+            </div>
+            <div class="card">
+                <div class="stat-label">Síntesis</div>
+                <div class="stat-number">0</div>
+                <small>ideas generadas</small>
+            </div>
+            <div class="card">
+                <div class="stat-label">Actualizado</div>
+                <div class="stat-number">Ahora</div>
+                <small>cada 1 hora</small>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🌐 Red de Pensamiento</h2>
+            <p style="font-size: 0.9em; color: #666; margin-bottom: 15px;">
+                Cada nodo es una nota/idea. Las líneas representan conexiones semánticas.
+                El grosor indica la fortaleza de la conexión.
+            </p>
+            <div id="network"></div>
+        </div>
+        
+        <div class="section">
+            <h2>🔗 Conexiones Más Fuertes</h2>
+            <div id="conexiones"></div>
+        </div>
+        
+        <div class="timestamp">
+            Generado: 2026-04-14 01:29:09 UTC
+        </div>
+    </div>
+    
+    <script>
+        // Datos del grafo
+        const nodos = [];
+        const enlaces = [{"source": "expansi\u00f3n del universo.md", "target": "expansi\u00f3n acelerada.md", "weight": 1.2927634716033936}];
+        
+        // Configuración básica
+        const width = document.getElementById('network').clientWidth;
+        const height = 500;
+        
+        // Crear simulación de fuerza
+        const simulation = d3.forceSimulation(nodos)
+            .force('link', d3.forceLink(enlaces)
+                .id(d => d.id)
+                .distance(100)
+                .strength(0.5))
+            .force('charge', d3.forceManyBody().strength(-300))
+            .force('center', d3.forceCenter(width / 2, height / 2));
+        
+        // Crear SVG
+        const svg = d3.select('#network').append('svg')
+            .attr('width', width)
+            .attr('height', height);
+        
+        // Dibujar enlaces
+        const link = svg.selectAll('line')
+            .data(enlaces)
+            .enter()
+            .append('line')
+            .attr('stroke', '#999')
+            .attr('stroke-opacity', 0.6)
+            .attr('stroke-width', d => Math.sqrt(d.weight) * 2);
+        
+        // Dibujar nodos
+        const node = svg.selectAll('circle')
+            .data(nodos)
+            .enter()
+            .append('circle')
+            .attr('r', 8)
+            .attr('fill', '#2a5298')
+            .attr('stroke', '#fff')
+            .attr('stroke-width', 2)
+            .style('cursor', 'pointer');
+        
+        // Añadir etiquetas
+        const labels = svg.selectAll('text')
+            .data(nodos)
+            .enter()
+            .append('text')
+            .attr('font-size', '11px')
+            .attr('font-weight', 'bold')
+            .attr('fill', '#2a5298')
+            .attr('text-anchor', 'middle')
+            .attr('dy', 25)
+            .text(d => d.label.substring(0, 10));
+        
+        // Actualizar posiciones
+        simulation.on('tick', () => {
+            link
+                .attr('x1', d => d.source.x)
+                .attr('y1', d => d.source.y)
+                .attr('x2', d => d.target.x)
+                .attr('y2', d => d.target.y);
+            
+            node
+                .attr('cx', d => d.x)
+                .attr('cy', d => d.y);
+            
+            labels
+                .attr('x', d => d.x)
+                .attr('y', d => d.y);
+        });
+        
+        // Interactividad con drag
+        node.call(d3.drag()
+            .on('start', dragstarted)
+            .on('drag', dragged)
+            .on('end', dragended));
+        
+        function dragstarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+        
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+        
+        function dragended(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+        
+        // Renderizar conexiones
+        const conexionesHtml = [["expansi\u00f3n del universo.md--expansi\u00f3n acelerada.md", 1.2927634716033936]].map(([nombre, fuerza]) => `
+            <div class="conexion">
+                <div class="conexion-nombre">${nombre.replace('--', ' ↔️ ').replace('.md', '')}</div>
+                <div class="conexion-fuerza">${(fuerza * 100).toFixed(0)}%</div>
+            </div>
+        `).join('');
+        document.getElementById('conexiones').innerHTML = conexionesHtml;
+    </script>
+    
+    <footer>
+        <p>🧠 Physarum-Mind • Pensamiento autónomo basado en biología computacional</p>
+        <p style="font-size: 0.9em; opacity: 0.7;">${REPO_NAME} • GitHub Actions • Actualización horaria</p>
+    </footer>
+</body>
+</html>
