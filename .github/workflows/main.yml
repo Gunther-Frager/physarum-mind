@@ -29,13 +29,14 @@ jobs:
 
       - name: Instalar dependencias
         run: |
-          pip install google-generativeai sentence-transformers numpy
+          pip install -r notas/requirements.txt
 
       - name: Ejecutar Agente de Pensamiento Autónomo
         env:
           # Variables de entorno con tokens de seguridad (configurados en GitHub Secrets)
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Para leer/escribir issues
         run: python slime_agent.py
 

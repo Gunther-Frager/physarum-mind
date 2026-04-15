@@ -26,6 +26,14 @@ import google.generativeai as genai
 from sentence_transformers import SentenceTransformer
 from datetime import datetime
 
+# Importar módulo de investigación
+try:
+    from knowledge_ingester import ejecutar_investigacion
+    KNOWLEDGE_INGESTER_AVAILABLE = True
+except ImportError:
+    KNOWLEDGE_INGESTER_AVAILABLE = False
+    print("⚠️  Advertencia: knowledge_ingester no está disponible. Deshabilitada investigación externa.")
+
 # ==================== CONFIGURACIÓN ====================
 # 📁 Ubicaciones
 NOTAS_PATH = "notas"                           # Directorio de notas (importadas + síntesis)
@@ -221,6 +229,17 @@ def ejecutar_agente():
                     print(f"   🔗 {nombres[i]} ↔️ {nombres[j]} (fuerza: {grafo['enlaces'][key]:.2f})")
     
     print(f"   ✓ {len(nuevas_conexiones)} conexión(es) suficientemente fuerte(s)")
+    
+    # 4.5️⃣ INVESTIGACIÓN: Buscar conocimiento externo (NUEVO)
+    if KNOWLEDGE_INGESTER_AVAILABLE:
+        print("\n🔬 INVESTIGACIÓN: Buscando conocimiento externo...")
+        try:
+            # Ejecutar investigación en top 5 notas
+            notas_para_investigar = nombres[:5]
+            ejecutar_investigacion(notas_para_investigar)
+            print("   ✓ Investigación completada")
+        except Exception as e:
+            print(f"   ⚠️  Error en investigación: {e}")
     
     # 5️⃣ CRECIMIENTO: Sintetizar
     print("\n🟡 CRECIMIENTO: Generando síntesis de ideas...")
