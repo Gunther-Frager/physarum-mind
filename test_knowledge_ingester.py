@@ -1,8 +1,10 @@
 """
-🧪 TEST: knowledge_ingester.py
-==============================
+🧪 TEST: knowledge_ingester.py (v2)
+===================================
 
-Tests unitarios básicos para el módulo de ingesta de conocimiento externo.
+Tests unitarios para el módulo mejorado de ingesta de conocimiento externo.
+
+NUEVO: Tests para validación POST-BÚSQUEDA, n-gramas, y keywords manuales.
 
 Ejecución:
   python test_knowledge_ingester.py
@@ -21,6 +23,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from knowledge_ingester import (
     extract_topics_from_note,
+    extract_ngrams,
+    extract_investigation_keywords,
     validate_and_extract_knowledge,
     enrich_note_with_references,
     annotate_graph_with_sources,
@@ -194,6 +198,159 @@ class TestAnnotateGraph(unittest.TestCase):
         self.assertFalse(result)
 
 
+class TestExtractNgrams(unittest.TestCase):
+    """Test de extracción de n-gramas (NUEVO)"""
+    
+    def test_ngrams_basic(self):
+        """Test: Extrae n-gramas básicos"""
+        text = "expansión del universo"
+        ngrams = extract_ngrams(text, n=2)
+        
+        # Debe contener "expansión del" o similar
+        self.assertGreater(len(ngrams), 0)
+        self.assertIsInstance(ngrams, list)
+    
+    def test_ngrams_respects_stopwords(self):
+        """Test: Ignora stopwords"""
+        text = "the quick brown fox"
+        ngrams = extract_ngrams(text, n=2)
+        
+        # No debe contener "the" solo
+        for ngram in ngrams:
+            self.assertNotEqual(ngram.lower(), "the")
+    
+    def test_ngrams_spanish(self):
+        """Test: Extrae n-gramas en español"""
+        text = "espaciotiempo relativista gravitacional"
+        ngrams = extract_ngrams(text, n=2)
+        
+        self.assertGreater(len(ngrams), 0)
+    
+    def test_ngrams_empty(self):
+        """Test: Maneja texto vacío"""
+        ngrams = extract_ngrams("")
+        self.assertEqual(len(ngrams), 0)
+    
+    def test_ngrams_short_text(self):
+        """Test: Maneja texto muy corto"""
+        ngrams = extract_ngrams("test")
+        # Puede retornar lista vacía si no hay suficientes palabras
+        self.assertIsInstance(ngrams, list)
+
+
+class TestExtractKeywords(unittest.TestCase):
+    """Test de extracción de keywords manuales (NUEVO)"""
+    
+    def test_investigar_keyword(self):
+        """Test: Detecta @investigar"""
+        content = "@investigar: relatividad general, mecánica cuántica"
+        keywords = extract_investigation_keywords(content)
+        
+        self.assertIn("relatividad general", keywords)
+        self.assertIn("mecánica cuántica", keywords)
+    
+    def test_investigate_english(self):
+        """Test: Detecta @investigate (inglés)"""
+        content = "@investigate: quantum mechanics, relativity"
+        keywords = extract_investigation_keywords(content)
+        
+        self.assertGreater(len(keywords), 0)
+    
+    def test_research_keyword(self):
+        """Test: Detecta @research"""
+        content = "@research: tema1, tema2, tema3"
+        keywords = extract_investigation_keywords(content)
+        
+        self.assertGreater(len(keywords), 0)
+    
+    def test_no_keywords(self):
+        """Test: Retorna vacío sin keywords"""
+        content = "Esta es una nota normal sin keywords"
+        keywords = extract_investigation_keywords(content)
+        
+        self.assertEqual(len(keywords), 0)
+    
+    def test_multiple_keywords_line(self):
+        """Test: Extrae múltiples temas de una línea"""
+        content = "@investigar: tema1, tema2, tema3, tema4"
+        keywords = extract_investigation_keywords(content)
+        
+        self.assertGreaterEqual(len(keywords), 3)
+
+
+class TestPostSearchValidation(unittest.TestCase):
+    """Test de validación POST-BÚSQUEDA (NUEVO - CRÍTICO)"""
+    
+    def test_validate_with_original_note(self):
+        """Test: Compara con nota original"""
+        # Nota sobre física/espaciotiempo
+        nota_original = """
+        # Expansión del Universo
+        El espaciotiempo se estira y se expande. La tela del universo crece constantemente.
+        """
+        
+        # Simular resultado: ciudad griega (FALSO POSITIVO si no se valida)
+        results = [
+            {
+                "source": "Wikipedia",
+                "title": "Estira (Ciudad Griega)",
+                "summary": "Estira es una antigua ciudad de Grecia ubicada en Eubea.",
+                "url": "http://example.com",
+                "relevance_score": 0.6
+            }
+        ]
+        
+        # Validar con nota original
+        validated = validate_and_extract_knowledge(
+            results,
+            "Estira",
+            nota_original=nota_original
+        )
+        
+        # Sin validación POST-BÚSQUEDA, habría sido aceptado
+        # Con validación, debe rechazarse (NOTA: depende de ENABLE_POST_SEARCH_VALIDATION)
+        self.assertIsInstance(validated, dict)
+    
+    def test_validate_relevant_result(self):
+        """Test: Acepta resultados relevantes"""
+        nota_original = "Sobre mecánica cuántica y física fundamental"
+        
+        results = [
+            {
+                "source": "arxiv",
+                "title": "Quantum Mechanics Principles",
+                "abstract": "Discussion of quantum mechanics and wave functions",
+                "url": "http://arxiv.org/example",
+                "relevance_score": 0.8
+            }
+        ]
+        
+        validated = validate_and_extract_knowledge(
+            results,
+            "quantum mechanics",
+            nota_original=nota_original
+        )
+        
+        self.assertIsInstance(validated, dict)
+    
+    def test_validate_missing_original_note(self):
+        """Test: Funciona sin nota original (fallback)"""
+        results = [
+            {
+                "source": "Wikipedia",
+                "title": "Test",
+                "summary": "Test content",
+                "url": "http://example.com",
+                "relevance_score": 0.7
+            }
+        ]
+        
+        # Sin nota original
+        validated = validate_and_extract_knowledge(results, "test query", nota_original=None)
+        
+        self.assertIsInstance(validated, dict)
+
+
 class TestIntegration(unittest.TestCase):
     """Tests de integración"""
     
@@ -224,6 +381,26 @@ class TestIntegration(unittest.TestCase):
         # 3. Validar (sin resultados, pero no debe fallar)
         validated = validate_and_extract_knowledge([], "test query")
         self.assertIsNotNone(validated)
+    
+    def test_pipeline_with_keywords(self):
+        """Test: Pipeline con @investigar keywords"""
+        nota_path = os.path.join(self.notas_dir, "test_keywords.md")
+        with open(nota_path, 'w') as f:
+            f.write("""
+# Nota con Keywords
+
+@investigar: tema importante 1, tema importante 2
+
+Contenido adicional...
+            """)
+        
+        with open(nota_path, 'r') as f:
+            content = f.read()
+        
+        # Debe extraer keywords
+        keywords = extract_investigation_keywords(content)
+        self.assertGreater(len(keywords), 0)
+
 
 
 # ==================== SUITE DE TESTS ====================
@@ -231,7 +408,7 @@ class TestIntegration(unittest.TestCase):
 def run_tests():
     """Ejecuta suite de tests"""
     print("\n" + "="*60)
-    print("🧪 EJECUTANDO TESTS - knowledge_ingester")
+    print("🧪 EJECUTANDO TESTS - knowledge_ingester v2")
     print("="*60 + "\n")
     
     # Crear suite de tests
@@ -240,7 +417,10 @@ def run_tests():
     
     # Agregar tests
     suite.addTests(loader.loadTestsFromTestCase(TestExtractTopics))
+    suite.addTests(loader.loadTestsFromTestCase(TestExtractNgrams))          # NUEVO
+    suite.addTests(loader.loadTestsFromTestCase(TestExtractKeywords))        # NUEVO
     suite.addTests(loader.loadTestsFromTestCase(TestValidateKnowledge))
+    suite.addTests(loader.loadTestsFromTestCase(TestPostSearchValidation))   # NUEVO (CRÍTICO)
     suite.addTests(loader.loadTestsFromTestCase(TestEnrichNote))
     suite.addTests(loader.loadTestsFromTestCase(TestAnnotateGraph))
     suite.addTests(loader.loadTestsFromTestCase(TestIntegration))

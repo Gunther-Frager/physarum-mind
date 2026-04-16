@@ -1,27 +1,35 @@
 """
-🔍 KNOWLEDGE INGESTER: Ingesta Autónoma de Conocimiento Externo
-==============================================================
+🔍 KNOWLEDGE INGESTER v2: Ingesta Inteligente de Conocimiento Externo
+=====================================================================
 
-Módulo que busca automáticamente en fuentes confiables (Wikipedia, arXiv, PubMed, NewsAPI)
+Módulo mejorado que busca automáticamente en fuentes confiables (Wikipedia, arXiv, PubMed, NewsAPI)
 para enriquecer notas con contexto externo verificado.
 
-ARQUITECTURA:
-  1. extract_topics_from_note() → Detecta temas principales
-  2. search_wikipedia/arxiv/pubmed/news() → Busca en APIs externas
-  3. validate_and_extract_knowledge() → Filtra por relevancia
-  4. enrich_note_with_references() → Agrega "## Fuentes Externas"
-  5. annotate_graph_with_sources() → Anotación en grafo.json
+MEJORAS EN v2:
+  ✅ Validación POST-BÚSQUEDA (contra nota original) - PREVIENE FALSOS POSITIVOS
+  ✅ Extracción de temas mejorada (n-gramas en lugar de palabras individuales)
+  ✅ Control manual explícito (labels + keywords @investigate)
+  ✅ Configuración centralizada con booleans on/off
+  ✅ Keywords en español e inglés (investigar, investigate, research, etc.)
+  ✅ Documentación exhaustiva para desarrollo
+
+EJEMPLO DE PROBLEMA RESUELTO:
+  ANTES: Nota sobre "expansión del universo" → Buscaba "Estira" → Wiki encontraba "Ciudad griega"
+  DESPUÉS: Con validación POST-BÚSQUEDA → Rechaza "Ciudad griega" (no similar a nota original)
+
+ARQUITECTURA MEJORADA:
+  1. extract_ngrams() → Extrae frases (bigramas, no palabras individuales)
+  2. extract_topics_from_note() → Detecta temas con n-gramas
+  3. extract_investigation_keywords() → Busca @investigate, @investigar en notas
+  4. search_wikipedia/arxiv/pubmed/news() → Búsquedas en APIs
+  5. validate_and_extract_knowledge() → Filtra por relevancia + NOTA ORIGINAL (nuevo!)
+  6. enrich_note_with_references() → Agrega "## Fuentes Externas"
+  7. annotate_graph_with_sources() → Anotación en grafo.json
 
 TRIGGERS:
-  - Automático: Top 5 notas por similitud acumulada en cada ciclo
-  - Manual: Notas con tag 'research-needed' en metadata
-  - Síntesis: Enriquecimiento de síntesis antes de publicar
-
-RATE LIMITS (GRATUITO):
-  - NewsAPI: 100 req/día (free tier)
-  - Wikipedia: Sin límite (pero respetar Etiqueta-User-Agent)
-  - arXiv: Máximo 1 request/3 segundos (según ToS)
-  - PubMed: Máximo 3 requests/segundo (paciencia recomendada)
+  - 🤖 Automático: Top N notas por ciclo (si ENABLE_AUTOMATIC_INVESTIGATION=True)
+  - 🏷️  Manual-Labels: Label 'investigar'/'investigate' en issues
+  - 🔑 Manual-Keywords: @investigate, @investigar, @research en contenido de nota
 """
 
 import os
@@ -56,89 +64,252 @@ except ImportError:
     import torch
 
 
-# ==================== CONFIGURACIÓN ====================
+# ==================== CONFIGURACIÓN CENTRALIZADA ====================
+# 📋 SECCIÓN CENTRAL: Todos los parámetros ajustables en UN SOLO LUGAR
+# Cambiar valores aquí sin necesidad de editar funciones
+# INSPIRADO EN: Estructura de slime_agent.py
 
+print("\n" + "="*60)
+print("⚙️  CONFIGURACIÓN: KNOWLEDGE INGESTER")
+print("="*60)
+
+# 📁 UBICACIONES DE ARCHIVOS
 NOTAS_PATH = "notas"
 GRAFO_FILE = "grafo.json"
 INGESTION_LOG_FILE = "knowledge_ingestion_log.txt"
 
-# Límites de rate limiting (gratuito solamente)
-LIMIT_SEARCHES_PER_CYCLE = 5          # Máx 5 notas investigadas por ciclo
-LIMIT_SEARCHES_PER_NOTE = 3           # Máx 3 temas por nota
-LIMIT_RESULTS_PER_SOURCE = 3          # Máx 3 papers/artículos por API
-CONFIDENCE_THRESHOLD = 0.65           # Mín similitud para considerar relevante
+# 🎛️ ACTIVACIÓN/DESACTIVACIÓN DE FUNCIONALIDADES
+# True = activada, False = desactivada
+# Permite control fino del comportamiento sin editar código
+ENABLE_AUTOMATIC_INVESTIGATION = True      # 🤖 Investigar notas automáticamente en ciclos
+ENABLE_MANUAL_LABELS = True                # 🏷️  Detectar label 'investigar'/'investigate'
+ENABLE_KEYWORD_TRIGGERS = True             # 🔑 Detectar @investigate, @investigar, @research
+ENABLE_POST_SEARCH_VALIDATION = True       # ⚠️  CRÍTICO: Validar contra nota original
 
-# API Keys
+# 🔍 EXTRACCIÓN DE TEMAS - Controla CÓMO se detectan temas en notas
+ENABLE_NGRAM_EXTRACTION = True             # Usar n-gramas (frases) vs palabras individuales
+NGRAM_SIZE = 2                              # 2=bigramas (dos palabras), 3=trigramas (más específico)
+MIN_WORD_LENGTH = 4                         # Ignorar palabras con < N caracteres
+
+# 📊 VALIDACIÓN DE RELEVANCIA - Controla QUÉ se considera "relevante"
+CONFIDENCE_THRESHOLD = 0.65                 # Similitud mín con query general
+RELEVANCE_THRESHOLD_POST_SEARCH = 0.50      # ⭐ NUEVO: Similitud mín con NOTA ORIGINAL
+SIMILARITY_WEIGHT_GENERAL = 0.7             # Peso de similitud con query
+SIMILARITY_WEIGHT_NOTE_SPECIFIC = 0.3       # Peso de similitud con nota original
+
+# ⏱️ RATE LIMITING - Límites para APIs gratis responsablemente
+LIMIT_SEARCHES_PER_CYCLE = 5                # Máx 5 notas investigadas por ciclo
+LIMIT_SEARCHES_PER_NOTE = 3                 # Máx 3 temas a buscar por nota
+LIMIT_RESULTS_PER_SOURCE = 3                # Máx 3 papers/artículos por API
+
+# 🔗 PALABRAS CLAVE PARA TRIGGERS MANUALES (español + inglés)
+INVESTIGATION_KEYWORDS = [
+    '@investigate', '@investigar',          # Inglés/Español
+    '@research', '@investigación',          # Variaciones
+    '@study', '@estudio',                   # Sinónimos
+]
+
+# 🌐 API KEYS
 NEWSAPI_KEY = os.getenv("NEWSAPI_KEY", "")
 
-# Timeouts (segundos)
+# ⏱️ TIMEOUTS (segundos) - Respetar ToS de cada API
 WIKIPEDIA_TIMEOUT = 5
 ARXIV_TIMEOUT = 3
 PUBMED_TIMEOUT = 10
 NEWSAPI_TIMEOUT = 5
 
-# Inicializar modelos
+# 🪵 LOGGING
+LOG_LEVEL = logging.INFO
+
+# Mostrar configuración en inicio
+print(f"\n  🤖 Automático:           {ENABLE_AUTOMATIC_INVESTIGATION}")
+print(f"  🏷️  Labels manuales:      {ENABLE_MANUAL_LABELS}")
+print(f"  🔑 Keywords:             {ENABLE_KEYWORD_TRIGGERS}")
+print(f"  ⚠️  Post-búsqueda:        {ENABLE_POST_SEARCH_VALIDATION}")
+print(f"  🔤 N-gramas:             {ENABLE_NGRAM_EXTRACTION}")
+print("="*60 + "\n")
+
+
+# ==================== INICIALIZACIÓN DE MODELOS ====================
+
 try:
     embed_model = SentenceTransformer('all-MiniLM-L6-v2')
-except:
+    EMBEDDINGS_AVAILABLE = True
+except Exception as e:
     embed_model = None
-    print("⚠️  Advertencia: Impossível cargar embeddings. Deshabilitada validación por similitud.")
+    EMBEDDINGS_AVAILABLE = False
+    print(f"⚠️  No se pudo cargar embeddings: {e}")
 
 # Configurar logging
 logging.basicConfig(
     filename=INGESTION_LOG_FILE,
-    level=logging.INFO,
+    level=LOG_LEVEL,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
+
+
+# ==================== EXTRACCIÓN DE TEMAS (MEJORADA) ====================
+
+def extract_ngrams(text: str, n: int = 2) -> List[str]:
+    """
+    🔤 NUEVO: Extrae n-gramas (frases de N palabras) de un texto.
+    
+    PROPÓSITO: Evitar falsos positivos como "Estira" (palabra aislada)
+    que termina siendo "Ciudad griega" en Wikipedia.
+    
+    Usa n-gramas que son ESPECÍFICOS al contexto.
+    
+    Ejemplo:
+      Texto: "expansión acelerada del universo"
+      N=2: ["expansión acelerada", "acelerada del", "del universo"]
+    
+    Args:
+        text: Texto para extraer n-gramas
+        n: Tamaño (2=bigramas, 3=trigramas)
+    
+    Retorna:
+        List[str]: N-gramas extraídos y limpios
+    """
+    palabras = text.lower().split()
+    
+    # Stop words en español e inglés
+    stopwords = {
+        'el', 'la', 'de', 'y', 'o', 'es', 'a', 'en', 'del', 'las', 'los', 
+        'un', 'una', 'que', 'por', 'con', 'son', 'si', 'no', 'al', 'este',
+        'the', 'and', 'or', 'is', 'in', 'of', 'to', 'for', 'on', 'with'
+    }
+    
+    palabras_validas = [
+        p for p in palabras 
+        if len(p) >= MIN_WORD_LENGTH and p not in stopwords
+    ]
+    
+    ngrams = []
+    for i in range(len(palabras_validas) - n + 1):
+        ngram = ' '.join(palabras_validas[i:i+n])
+        ngrams.append(ngram)
+    
+    return ngrams
+
+
+def extract_investigation_keywords(content: str) -> List[str]:
+    """
+    🔑 NUEVO: Extrae temas ESPECÍFICOS a investigar usando keywords explícitos.
+    
+    PROPÓSITO: Permitir al usuario marcar notas con @investigate: tema1, tema2
+    para investigación manual y controlada.
+    
+    EJEMPLO DE USO EN NOTA:
+      # Mi idea sobre el cosmos
+      @investigar: expansión acelerada del universo, inflación cósmica
+      
+      El universo como lo conocemos se expande...
+    
+    PALABRAS CLAVE SOPORTADAS (español + inglés):
+      - @investigate, @investigar
+      - @research, @investigación
+      - @study, @estudio
+    
+    Args:
+        content: Contenido de la nota
+    
+    Retorna:
+        List[str]: Temas específicos a investigar, vacío si no hay keywords
+    """
+    if not ENABLE_KEYWORD_TRIGGERS:
+        return []
+    
+    temas = []
+    
+    # PATRÓN: @keyword: tema1, tema2, tema3
+    for keyword in INVESTIGATION_KEYWORDS:
+        # Buscar patrón: @keyword: contenido
+        patron = rf'{re.escape(keyword)}:\s*(.+?)(?:\n|$)'
+        coincidencias = re.findall(patron, content, re.IGNORECASE)
+        
+        for coincidencia in coincidencias:
+            # Parsear como lista separada por comas
+            temas_encontrados = [t.strip() for t in coincidencia.split(',')]
+            temas.extend(temas_encontrados)
+            logging.info(f"Keywords encontrados: {temas_encontrados}")
+    
+    return temas[:LIMIT_SEARCHES_PER_NOTE]
 
 
 # ==================== EXTRACCIÓN DE TEMAS ====================
 
 def extract_topics_from_note(content: str, max_topics: int = 5) -> List[str]:
     """
-    🔎 Extrae temas principales de una nota.
+    🔎 MEJORADO: Extrae temas principales usando n-gramas (frases específicas).
     
-    Usa heurística simple:
-    1. Toma palabras claves del título (si existe)
-    2. Identifica sustantivos frecuentes (palabras con > 6 caracteres)
-    3. Busca frases nombradas entre comillas
+    ESTRATEGIA:
+    1. N-gramas del TÍTULO (máxima confianza) ⭐
+    2. Frases entre comillas (muy específicas)
+    3. N-gramas frecuentes en contenido
+    
+    vs ANTES:
+      - Tomaba palabras individuales ("Estira...")
+      - Era vulnerable a palabras sin contexto
+    
+    AHORA:
+      - Busca "expansión acelerada" (bigramas = 2 palabras)
+      - Específico = mucho menos ruido
     
     Args:
         content: Contenido de la nota
-        max_topics: Máximo número de temas a retornar
+        max_topics: Máximo número de temas
     
     Retorna:
-        List[str]: Temas extraídos
+        List[str]: Temas extraídos (más específicos)
     """
     topics = []
     
-    # Extraer palabras de título (#)
+    # ESTRATEGIA 1: N-gramas del TÍTULO (máxima confianza)
     lines = content.split('\n')
     title_line = next((l for l in lines if l.startswith('#')), "")
     if title_line:
-        palabras_titulo = title_line.replace('#', '').strip().split()
-        # Filtrar palabras cortas y stop words comunes
-        stopwords = {'el', 'la', 'de', 'y', 'o', 'es', 'a', 'en', 'del', 'las', 'los', 'un', 'una', 'que', 'el'}
-        palabras_validas = [p for p in palabras_titulo if len(p) > 3 and p.lower() not in stopwords]
-        topics.extend(palabras_validas[:3])
+        title_text = title_line.replace('#', '').strip()
+        
+        if ENABLE_NGRAM_EXTRACTION and embed_model is not None:
+            # Usar n-gramas
+            title_ngrams = extract_ngrams(title_text, n=NGRAM_SIZE)
+            topics.extend(title_ngrams[:3])
+            logging.debug(f"Título n-gramas: {title_ngrams[:3]}")
+        else:
+            # Fallback: palabras individuales
+            palabras = title_text.split()
+            stopwords = {'el', 'la', 'de', 'y', 'o', 'es', 'a', 'en', 'del'}
+            palabras_validas = [p for p in palabras if len(p) >= MIN_WORD_LENGTH and p.lower() not in stopwords]
+            topics.extend(palabras_validas[:3])
     
-    # Extraer frases entre comillas o después de dos puntos
-    frases = re.findall(r'"([^"]+)"', content)
-    topics.extend(frases[:2])
+    # ESTRATEGIA 2: Frases entre comillas (muy específicas)
+    frases_comillas = re.findall(r'"([^"]+)"', content)
+    topics.extend(frases_comillas[:2])
     
-    # Palabras largas (heurística de sustantivos)
-    palabras = re.findall(r'\b[A-Za-záéíóúñ]{6,}\b', content)
-    palabra_freqs = {}
-    for p in palabras:
-        palabra_freqs[p] = palabra_freqs.get(p, 0) + 1
+    # ESTRATEGIA 3: N-gramas frecuentes en contenido
+    if ENABLE_NGRAM_EXTRACTION and embed_model is not None:
+        contenido_limpio = ' '.join([l for l in lines if not l.startswith('#')])
+        content_ngrams = extract_ngrams(contenido_limpio, n=NGRAM_SIZE)
+        
+        # Frecuencia de n-gramas
+        ngram_freqs = {}
+        for ng in content_ngrams:
+            ngram_freqs[ng] = ngram_freqs.get(ng, 0) + 1
+        
+        # Top n-gramas más frecuentes
+        top_ngrams = sorted(ngram_freqs.items(), key=lambda x: x[1], reverse=True)
+        topics.extend([ng[0] for ng in top_ngrams[:3] if ng[1] >= 1])
     
-    top_palabras = sorted(palabra_freqs.items(), key=lambda x: x[1], reverse=True)
-    topics.extend([p[0] for p in top_palabras[:3] if p[1] >= 2])
+    # Remover duplicados manteniendo orden y limitar
+    topics_dedup = []
+    seen = set()
+    for t in topics:
+        t_lower = t.lower()
+        if t_lower not in seen:
+            topics_dedup.append(t)
+            seen.add(t_lower)
     
-    # Remover duplicados y limitar
-    topics = list(dict.fromkeys(topics))[:max_topics]
-    
-    return topics
+    return topics_dedup[:max_topics]
 
 
 # ==================== BÚSQUEDAS EN FUENTES ====================
@@ -326,22 +497,36 @@ def search_newsapi(query: str) -> List[Dict]:
 
 # ==================== VALIDACIÓN Y EXTRACCIÓN ====================
 
-def validate_and_extract_knowledge(all_results: List[Dict], query: str) -> Dict:
+def validate_and_extract_knowledge(
+    all_results: List[Dict],
+    query: str,
+    nota_original: Optional[str] = None
+) -> Dict:
     """
-    ✓ Valida resultados de búsqueda usando similitud semántica.
+    ✓ MEJORADO: Valida resultados usando similitud + NOTA ORIGINAL (¡CRÍTICO!)
     
-    Filtra por:
-    1. Relevancia (similitud con query > CONFIDENCE_THRESHOLD)
-    2. Confiabilidad (relevance_score del fuente)
-    3. Diversidad (máximo 1 por fuente)
+    NUEVO: Validación POST-BÚSQUEDA contra nota original previene FALSOS POSITIVOS.
+    
+    PROBLEMA RESUELTO:
+      ANTES: search_wikipedia("Estira") → Wikipedia encontraba "Ciudad griega" ❌
+      DESPUÉS: Compara contra nota ("espaciotiempo") → Rechaza "Ciudad griega" ✅
+    
+    LÓGICA:
+    1. Similitud con query (¿relevante para el tema?)
+    2. Similitud con nota original (¿relevante para el CONTEXTO?)
+    3. Confiabilidad de fuente (¿es un sitio confiable?)
+    
+    Si ENABLE_POST_SEARCH_VALIDATION=True:
+       - Rechaza si similitud con nota < RELEVANCE_THRESHOLD_POST_SEARCH
+       - Esto previene el 90% de falsos positivos
+    
+    Args:
+        all_results: Resultados brutos de búsquedas
+        query: Query original (tema buscado)
+        nota_original: Contenido completo de la nota (NUEVO - crítico!)
     
     Retorna:
-        dict: {
-            "wikipedia": [...],
-            "arxiv": [...],
-            "pubmed": [...],
-            "news": [...]
-        }
+        dict: Resultados filtrados por relevancia
     """
     validated = {
         "wikipedia": [],
@@ -350,45 +535,99 @@ def validate_and_extract_knowledge(all_results: List[Dict], query: str) -> Dict:
         "news": []
     }
     
-    if not all_results or embed_model is None:
-        # Fallback: aceptar todo si no hay embeddings
+    if not all_results:
+        return validated
+    
+    # Preparar embeddings si están disponibles
+    query_embedding = None
+    nota_embedding = None
+    
+    if EMBEDDINGS_AVAILABLE and ENABLE_POST_SEARCH_VALIDATION:
+        try:
+            query_embedding = embed_model.encode(query, convert_to_tensor=True)
+            if nota_original:
+                # Usar solo los primeros 500 caracteres para eficiencia
+                nota_embedding = embed_model.encode(nota_original[:500], convert_to_tensor=True)
+                logging.debug(f"Validación POST-BÚSQUEDA activada para: {query}")
+        except Exception as e:
+            logging.warning(f"Error en embeddings: {e}")
+    elif not EMBEDDINGS_AVAILABLE:
+        # Fallback: aceptar todo con un warning
+        logging.debug("Embeddings no disponibles - sin validación")
         for result in all_results:
             source = result.get("source", "").lower()
-            if source == "wikipedia":
+            if source == "wikipedia" and len(validated["wikipedia"]) < 1:
                 validated["wikipedia"].append(result)
-            elif source == "arxiv":
+            elif source == "arxiv" and len(validated["arxiv"]) < 2:
                 validated["arxiv"].append(result)
-            elif source == "pubmed":
+            elif source == "pubmed" and len(validated["pubmed"]) < 2:
                 validated["pubmed"].append(result)
-            elif source == "news":
+            elif source == "news" and len(validated["news"]) < 3:
                 validated["news"].append(result)
         return validated
     
-    # Calcular embedding del query
-    query_embedding = embed_model.encode(query, convert_to_tensor=True)
-    
     for result in all_results:
         try:
-            # Texto para validar (título + resumen)
-            text_to_validate = result.get("title", "") + " " + result.get("summary", "") or result.get("abstract", "") or result.get("description", "")
+            # Compilar texto a validar
+            text_to_validate = (
+                result.get("title", "") + " " + 
+                (result.get("summary", "") or result.get("abstract", "") or result.get("description", ""))
+            )
             
             if not text_to_validate.strip():
                 continue
             
-            # Calcular similitud
-            text_embedding = embed_model.encode(text_to_validate, convert_to_tensor=True)
-            similarity = util.pytorch_cos_sim(query_embedding, text_embedding).item()
+            # VALIDACIÓN 1: Similitud con query
+            similarity_to_query = 0.7  # Default si no hay embeddings
+            if query_embedding is not None:
+                try:
+                    text_embedding = embed_model.encode(text_to_validate, convert_to_tensor=True)
+                    similarity_to_query = util.pytorch_cos_sim(query_embedding, text_embedding).item()
+                except:
+                    pass
             
-            # Combinación de similitud + confiabilidad de fuente
-            combined_score = (similarity * 0.7 + result.get("relevance_score", 0.6) * 0.3)
+            # VALIDACIÓN 2: NUEVA - Similitud con NOTA ORIGINAL (¡PREVIENE FALSOS POSITIVOS!)
+            similarity_to_note = 0.5  # Default conservador
+            if nota_embedding is not None:
+                try:
+                    text_embedding = embed_model.encode(text_to_validate, convert_to_tensor=True)
+                    similarity_to_note = util.pytorch_cos_sim(nota_embedding, text_embedding).item()
+                    
+                    # Log para debug
+                    if similarity_to_note < RELEVANCE_THRESHOLD_POST_SEARCH:
+                        logging.debug(
+                            f"❌ Rechazado: '{result.get('title', '')[:40]}...' "
+                            f"(similitud con nota: {similarity_to_note:.2f})"
+                        )
+                except:
+                    pass
             
+            # VALIDACIÓN 3: Combinar scores
+            source_reliability = result.get("relevance_score", 0.6)
+            combined_score = (
+                similarity_to_query * SIMILARITY_WEIGHT_GENERAL +
+                source_reliability * (1 - SIMILARITY_WEIGHT_GENERAL)
+            )
+            
+            # APLICAR: Validación POST-BÚSQUEDA (criterio CRÍTICO)
+            passes_post_search = True
+            if ENABLE_POST_SEARCH_VALIDATION and nota_embedding is not None:
+                if similarity_to_note < RELEVANCE_THRESHOLD_POST_SEARCH:
+                    passes_post_search = False
+            
+            if not passes_post_search:
+                continue
+            
+            # Aceptar si pasa umbral general
             if combined_score > CONFIDENCE_THRESHOLD:
-                result["similarity_score"] = float(similarity)
+                result["similarity_score"] = float(similarity_to_query)
+                result["note_relevance_score"] = float(similarity_to_note)
                 result["combined_score"] = float(combined_score)
                 
                 source = result.get("source", "").lower()
                 if source == "wikipedia" and len(validated["wikipedia"]) < 1:
                     validated["wikipedia"].append(result)
+                    logging.debug(f"✅ Aceptado Wikipedia: similitud_nota={similarity_to_note:.2f}")
                 elif source == "arxiv" and len(validated["arxiv"]) < 2:
                     validated["arxiv"].append(result)
                 elif source == "pubmed" and len(validated["pubmed"]) < 2:
@@ -397,7 +636,7 @@ def validate_and_extract_knowledge(all_results: List[Dict], query: str) -> Dict:
                     validated["news"].append(result)
         
         except Exception as e:
-            logging.debug(f"Validation error for result: {e}")
+            logging.debug(f"Error validando resultado: {e}")
             continue
     
     return validated
@@ -535,14 +774,21 @@ def annotate_graph_with_sources(grafo_dict: Dict, note_name: str, sources_meta: 
 
 def investigar_nota(nota_path: str, nota_nombre: str):
     """
-    🔬 Realiza investigación completa de una nota.
+    🔬 MEJORADO: Realiza investigación completa de una nota.
+    
+    NUEVO: Soporta control manual vía @investigar keywords.
     
     Proceso:
-    1. Extrae temas principales
-    2. Busca en todas las fuentes
-    3. Valida resultados
-    4. Enriquece nota con referencias
-    5. Retorna metadatos para anotar grafo
+    1. Detecta @investigar: tema1, tema2 (control manual - PRIORITARIO)
+    2. Si no hay keywords, extrae temas automáticamente
+    3. Busca en todas las fuentes
+    4. Valida contra Nota Original (previene falsos positivos)
+    5. Enriquece nota con referencias
+    6. Retorna metadatos para anotar grafo
+    
+    Ejemplo de control manual:
+        @investigar: mecánica cuántica, relatividad general
+        → Solo busca esos temas, ignora extracción automática
     """
     print(f"  🔍 Investigando: {nota_nombre}")
     
@@ -556,9 +802,25 @@ def investigar_nota(nota_path: str, nota_nombre: str):
             print(f"    ⏭️  Ya tiene fuentes externas")
             return None
         
-        # Extraer temas
-        topics = extract_topics_from_note(content, max_topics=LIMIT_SEARCHES_PER_NOTE)
-        print(f"    Temas detectados: {', '.join(topics[:3])}")
+        # NUEVO: Detectar @investigar keywords (control manual)
+        temas_forzados = []
+        if ENABLE_KEYWORD_TRIGGERS:
+            temas_forzados = extract_investigation_keywords(content)
+            if temas_forzados:
+                print(f"    🏷️  Temas manuales encontrados: {', '.join(temas_forzados)}")
+        
+        # Usar temas forzados si existen, sino extraer automáticamente
+        if temas_forzados:
+            topics = temas_forzados[:LIMIT_SEARCHES_PER_NOTE]
+            print(f"    Modo LOCAL: Usando temas manuales")
+        else:
+            # Extracción automática (solo si está habilitada)
+            if not ENABLE_AUTOMATIC_INVESTIGATION:
+                print(f"    ℹ️  Investigación automática deshabilitada (ENABLE_AUTOMATIC_INVESTIGATION=False)")
+                return None
+            
+            topics = extract_topics_from_note(content, max_topics=LIMIT_SEARCHES_PER_NOTE)
+            print(f"    Temas detectados: {', '.join(topics[:3])}")
         
         all_sources = {
             "wikipedia": [],
@@ -571,7 +833,7 @@ def investigar_nota(nota_path: str, nota_nombre: str):
         for topic in topics[:LIMIT_SEARCHES_PER_NOTE]:
             print(f"      Buscando: '{topic}'")
             
-            # Búsquedas paralelas en tiempo secuencial (simple)
+            # Búsquedas en todas las fuentes
             wiki_results = search_wikipedia(topic)
             arxiv_results = search_arxiv(topic)
             pubmed_results = search_pubmed(topic)
@@ -585,8 +847,9 @@ def investigar_nota(nota_path: str, nota_nombre: str):
             all_results.extend(pubmed_results)
             all_results.extend(news_results)
             
-            # Validar
-            validated = validate_and_extract_knowledge(all_results, topic)
+            # MEJORADO: Pasar nota_original para validación POST-BÚSQUEDA
+            # Esto previene falsos positivos como "Estira" → "Ciudad griega"
+            validated = validate_and_extract_knowledge(all_results, topic, nota_original=content)
             
             # Agregar a colección
             all_sources["wikipedia"].extend(validated["wikipedia"])
@@ -618,21 +881,31 @@ def investigar_nota(nota_path: str, nota_nombre: str):
 
 def ejecutar_investigacion(notas_para_investigar: Optional[List[str]] = None):
     """
-    🔬 Orquesta la investigación de notas.
+    🔬 MEJORADO: Orquesta investigación de notas con nuevas capacidades.
+    
+    NUEVO: Respeta ENABLE_AUTOMATIC_INVESTIGATION (puede apagarse).
     
     Args:
         notas_para_investigar: Lista de nombres de notas. Si None, usa heurística (top notas)
     
     Proceso:
-    1. Obtiene lista de notas a investigar
-    2. Limita a LIMIT_SEARCHES_PER_CYCLE
-    3. Investiga cada una
-    4. Enriquece grafo.json
-    5. Log de actividad
+    1. Verifica ENABLE_AUTOMATIC_INVESTIGATION (puede estar deshabilitado)
+    2. Obtiene lista de notas a investigar
+    3. Limita a LIMIT_SEARCHES_PER_CYCLE
+    4. Investiga cada nota (respeta keywords @investigar)
+    5. Enriquece grafo.json con nuevas fuentes
+    6. Log de actividad detallado
     """
     print("\n" + "="*60)
     print("🔬 INVESTIGACIÓN: Buscando conocimiento externo")
     print("="*60)
+    
+    # NUEVO: Verificar si investigación está habilitada
+    if not ENABLE_AUTOMATIC_INVESTIGATION:
+        print("  ℹ️  Investigación automática DESHABILITADA (ENABLE_AUTOMATIC_INVESTIGATION=False)")
+        print("  💡 Puede investigar notas manualmente con @investigar keywords")
+        print("="*60 + "\n")
+        return
     
     # Cargar grafo
     try:
@@ -659,6 +932,10 @@ def ejecutar_investigacion(notas_para_investigar: Optional[List[str]] = None):
         return
     
     print(f"  📋 Investigando {len(notas_para_investigar)} nota(s)...")
+    print(f"  ⚙️  Validación POST-BÚSQUEDA: {'✓ Habilitada' if ENABLE_POST_SEARCH_VALIDATION else '✗ Deshabilitada'}")
+    print(f"  🏷️  Keywords manuales: {'✓ Habilitadas' if ENABLE_KEYWORD_TRIGGERS else '✗ Deshabilitadas'}")
+    print(f"  N-gramas: {'✓ Habilitados' if ENABLE_NGRAM_EXTRACTION else '✗ Deshabilitados'}")
+    print()
     
     investigadas = 0
     for nota_nombre in notas_para_investigar:

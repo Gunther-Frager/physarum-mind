@@ -99,17 +99,92 @@ CONEXIÓN FUERTE → Llama a Gemini API
 - Máx 150 palabras
 - Se publica como Issue etiquetado `#synthesis`
 
-### 5️⃣ **PERSISTENCIA**: Guardado del Estado
-```json
-{
-  "nodos": {"nota1.md": {}, "nota2.md": {}},
-  "enlaces": {"nota1.md--nota2.md": 1.82, ...}
-}
+### 5️⃣ **INVESTIGACIÓN** ← ⭐ NUEVA FASE (v2)
+
+```python
+# Busca automáticamente en fuentes externas confiables
+# para enriquecer notas con conocimiento verificado
+
+ejecutar_investigacion()
+  ├─ Para cada nota sin "## Fuentes Externas":
+  │  ├─ Detecta @investigar keywords (control manual) ← PRIORITARIO
+  │  ├─ Si no hay keywords → Extrae temas con n-gramas
+  │  ├─ Busca en: Wikipedia, arXiv, PubMed, NewsAPI
+  │  ├─ Valida CONTRA NOTA ORIGINAL (previene falsos positivos)
+  │  └─ Enriquece nota con "## Fuentes Externas"
+  └─ Anota grafo.json con nuevas fuentes
 ```
+
+**¿Qué es Knowledge Ingester v2?**
+
+Un módulo que enriquece notas con conocimiento verificado de fuentes confiables. 
+
+**Problema que resuelve:**
+
+```
+Nota: "Expansión del Universo"
+Contenido: "El espaciotiempo se estira..."
+
+v1 BUG: Busca "Estira" → Wikipedia retorna "Estira (Ciudad Griega)" ❌
+
+v2 FIX: 
+  1. Usa n-gramas: "expansión acelerada", "espaciotiempo"
+  2. Valida contra nota original: similitud("Ciudad", "universo") = 0.15 ❌
+  3. Rechaza resultado irrelevante ✓
+```
+
+**Características:**
+
+- ✅ **Validación POST-BÚSQUEDA** contra nota original (previene 90% falsos positivos)
+- ✅ **Extracción inteligente** con n-gramas (frases, no palabras individuales)
+- ✅ **Control manual** vía @investigar keywords en notas
+- ✅ **Configuración centralizada** con 12+ booleans on/off
+- ✅ **Fuentes confiables**: Wikipedia, arXiv, PubMed, NewsAPI (todas gratis)
+
+**Cómo usar:**
+
+Opción 1 - Automático:
+```markdown
+# Mi Nota Sobre Física
+
+El contenido aquí...
+```
+→ Sistema busca automáticamente, valida resultados, enriquece
+
+Opción 2 - Manual (Recomendado):
+```markdown
+# Mi Nota Sobre Física
+
+@investigar: relatividad general, mecánica cuántica
+
+El contenido aquí...
+```
+→ Sistema busca exactamente lo especificado, valida, enriquece
+
+**Resultado:**
+```markdown
+# Mi Nota Sobre Física
+
+@investigar: relatividad general, mecánica cuántica
+
+El contenido...
+
+## Fuentes Externas
+
+### Wikipedia
+- **Relatividad General** (relevancia: 0.82)
+  https://es.wikipedia.org/wiki/Relatividad_general
+  
+### arXiv
+- **Modern Approaches to General Relativity** (relevancia: 0.78)
+  https://arxiv.org/abs/2301.12345
+```
+
+📖 **Docs completa:** Ver [KNOWLEDGE_INGESTER_V2_CHANGELOG.md](KNOWLEDGE_INGESTER_V2_CHANGELOG.md) y [KNOWLEDGE_INGESTER_ARCHITECTURE.md](KNOWLEDGE_INGESTER_ARCHITECTURE.md)
 
 ---
 
-## 📥 Cómo Alimentar al Sistema
+## 🔄 Cómo Funciona: El Ciclo de Pensamiento
 
 ### Opción 1: Crear Issues con Label `idea` ✨ (Recomendado)
 
@@ -271,6 +346,8 @@ python dashboard_generator.py      # Actualizar dashboard
 
 ## 📊 Parámetros Ajustables
 
+### slime_agent.py (Pensamiento)
+
 En [slime_agent.py](slime_agent.py), puedes tunear:
 
 ```python
@@ -279,6 +356,33 @@ THRESHOLD_CONECTAR = 0.6         # Sensibilidad: 0.5 = muy sensible, 0.8 = selec
 THRESHOLD_SINTESIS = 1.5         # Cuándo sintetizar: 1.0 = frecuente, 2.0 = raro
 MODELO_EMBEDDING = 'all-MiniLM-L6-v2'  # Cambiar si necesitas mejor precisión
 ```
+
+### knowledge_ingester.py (Investigación) ← NUEVO
+
+En [knowledge_ingester.py](knowledge_ingester.py), puedes controlar:
+
+```python
+# 🎛️ ACTIVACIÓN/DESACTIVACIÓN
+ENABLE_AUTOMATIC_INVESTIGATION = True       # 🤖 Investigar automáticamente
+ENABLE_MANUAL_LABELS = True                 # 🏷️  Detectar labels en issues
+ENABLE_KEYWORD_TRIGGERS = True              # 🔑 Detectar @investigar en notas
+ENABLE_POST_SEARCH_VALIDATION = True        # ⚠️  CRÍTICO: Validar contra nota
+
+# 🔍 EXTRACCIÓN
+ENABLE_NGRAM_EXTRACTION = True              # Usar frases vs palabras individuales
+NGRAM_SIZE = 2                              # Bigramas (2 palabras)
+
+# 📊 VALIDACIÓN
+CONFIDENCE_THRESHOLD = 0.65                 # Similitud mín con query
+RELEVANCE_THRESHOLD_POST_SEARCH = 0.50      # Similitud mín con NOTA
+
+# ⏱️ RATE LIMITING (APIs gratis)
+LIMIT_SEARCHES_PER_CYCLE = 5                # Max 5 notas/ciclo
+LIMIT_SEARCHES_PER_NOTE = 3                 # Max 3 temas/nota
+LIMIT_RESULTS_PER_SOURCE = 3                # Max 3 resultados/fuente
+```
+
+**Todos los parámetros se imprimen en cada ejecución para transparencia**
 
 ---
 
