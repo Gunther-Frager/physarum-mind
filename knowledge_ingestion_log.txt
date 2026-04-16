@@ -1644,3 +1644,147 @@ Wikcionario
 2026-04-15 23:35:47,744 - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=alta&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
 2026-04-15 23:35:48,297 - INFO - Got first page: 79 of 79 total results
 2026-04-15 23:35:57,419 - WARNING - PubMed search failed for 'alta': Expecting value: line 1 column 1 (char 0)
+2026-04-16 01:24:05,583 - INFO - No device provided, using cpu
+2026-04-16 01:24:05,690 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-16 01:24:05,709 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/modules.json "HTTP/1.1 200 OK"
+2026-04-16 01:24:05,836 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-16 01:24:05,849 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-04-16 01:24:05,850 - INFO - Loading SentenceTransformer model from sentence-transformers/all-MiniLM-L6-v2.
+2026-04-16 01:24:05,956 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-16 01:24:05,970 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-04-16 01:24:06,068 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-04-16 01:24:06,082 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/README.md "HTTP/1.1 200 OK"
+2026-04-16 01:24:06,177 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-16 01:24:06,190 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/modules.json "HTTP/1.1 200 OK"
+2026-04-16 01:24:06,291 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-16 01:24:06,308 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-04-16 01:24:06,413 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+2026-04-16 01:24:06,519 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-16 01:24:06,531 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/config.json "HTTP/1.1 200 OK"
+2026-04-16 01:24:06,587 - WARNING - [1mBertModel LOAD REPORT[0m from: sentence-transformers/all-MiniLM-L6-v2
+Key                     | Status     |  | 
+------------------------+------------+--+-
+embeddings.position_ids | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+2026-04-16 01:24:06,695 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-04-16 01:24:06,796 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/preprocessor_config.json "HTTP/1.1 404 Not Found"
+2026-04-16 01:24:06,902 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/video_preprocessor_config.json "HTTP/1.1 404 Not Found"
+2026-04-16 01:24:06,999 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/preprocessor_config.json "HTTP/1.1 404 Not Found"
+2026-04-16 01:24:07,096 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-16 01:24:07,109 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-04-16 01:24:07,211 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-16 01:24:07,226 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/config.json "HTTP/1.1 200 OK"
+2026-04-16 01:24:07,346 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-16 01:24:07,359 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/config.json "HTTP/1.1 200 OK"
+2026-04-16 01:24:07,459 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-16 01:24:07,472 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-04-16 01:24:07,576 - INFO - HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/all-MiniLM-L6-v2/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-04-16 01:24:07,688 - INFO - HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/all-MiniLM-L6-v2/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-04-16 01:24:07,817 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-16 01:24:07,831 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-04-16 01:24:07,938 - INFO - HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/all-MiniLM-L6-v2 "HTTP/1.1 200 OK"
+2026-04-16 01:24:08,191 - INFO - Keywords encontrados: ['expansión universo', 'tela espaciotiempo', 'estiramiento espaciotiempo']
+2026-04-16 01:24:09,240 - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=expansi%C3%B3n+universo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:24:09,696 - INFO - Sleeping: 2.999971 seconds
+2026-04-16 01:24:12,699 - INFO - Requesting page (first: True, try: 1): https://export.arxiv.org/api/query?search_query=expansi%C3%B3n+universo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:24:12,944 - INFO - Sleeping: 2.999982 seconds
+2026-04-16 01:24:15,945 - INFO - Requesting page (first: True, try: 2): https://export.arxiv.org/api/query?search_query=expansi%C3%B3n+universo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:24:16,427 - INFO - Sleeping: 2.999966 seconds
+2026-04-16 01:24:19,430 - INFO - Requesting page (first: True, try: 3): https://export.arxiv.org/api/query?search_query=expansi%C3%B3n+universo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:25:20,604 - WARNING - arXiv search failed for 'expansión universo': Page request resulted in HTTP 503 (https://export.arxiv.org/api/query?search_query=expansi%C3%B3n+universo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100)
+2026-04-16 01:25:21,122 - WARNING - PubMed search failed for 'expansión universo': Expecting value: line 1 column 1 (char 0)
+2026-04-16 01:25:22,534 - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=tela+espaciotiempo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:25:38,305 - INFO - Sleeping: 2.999977 seconds
+2026-04-16 01:25:41,308 - INFO - Requesting page (first: True, try: 1): https://export.arxiv.org/api/query?search_query=tela+espaciotiempo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:25:41,479 - INFO - Sleeping: 2.999978 seconds
+2026-04-16 01:25:44,483 - INFO - Requesting page (first: True, try: 2): https://export.arxiv.org/api/query?search_query=tela+espaciotiempo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:25:44,677 - INFO - Sleeping: 2.999979 seconds
+2026-04-16 01:25:47,680 - INFO - Requesting page (first: True, try: 3): https://export.arxiv.org/api/query?search_query=tela+espaciotiempo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:26:03,437 - WARNING - arXiv search failed for 'tela espaciotiempo': Page request resulted in HTTP 429 (https://export.arxiv.org/api/query?search_query=tela+espaciotiempo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100)
+2026-04-16 01:26:03,711 - WARNING - PubMed search failed for 'tela espaciotiempo': Expecting value: line 1 column 1 (char 0)
+2026-04-16 01:26:04,166 - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=estiramiento+espaciotiempo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:26:20,013 - INFO - Sleeping: 2.999975 seconds
+2026-04-16 01:26:23,017 - INFO - Requesting page (first: True, try: 1): https://export.arxiv.org/api/query?search_query=estiramiento+espaciotiempo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:26:38,542 - INFO - Sleeping: 2.999975 seconds
+2026-04-16 01:26:41,545 - INFO - Requesting page (first: True, try: 2): https://export.arxiv.org/api/query?search_query=estiramiento+espaciotiempo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:26:41,733 - INFO - Sleeping: 2.999977 seconds
+2026-04-16 01:26:44,736 - INFO - Requesting page (first: True, try: 3): https://export.arxiv.org/api/query?search_query=estiramiento+espaciotiempo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:27:00,207 - WARNING - arXiv search failed for 'estiramiento espaciotiempo': Page request resulted in HTTP 429 (https://export.arxiv.org/api/query?search_query=estiramiento+espaciotiempo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100)
+2026-04-16 01:27:00,487 - WARNING - PubMed search failed for 'estiramiento espaciotiempo': Expecting value: line 1 column 1 (char 0)
+2026-04-16 01:27:00,627 - INFO - Nota notas/expansión del universo.md enriquecida con fuentes externas.
+2026-04-16 01:27:00,627 - INFO - Nota expansión del universo.md investigada: 1 fuentes agregadas
+2026-04-16 01:27:01,680 - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=desde+n%C3%BAcleo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:27:02,013 - INFO - Sleeping: 2.999970 seconds
+2026-04-16 01:27:05,016 - INFO - Requesting page (first: True, try: 1): https://export.arxiv.org/api/query?search_query=desde+n%C3%BAcleo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:27:05,238 - INFO - Sleeping: 2.999977 seconds
+2026-04-16 01:27:08,241 - INFO - Requesting page (first: True, try: 2): https://export.arxiv.org/api/query?search_query=desde+n%C3%BAcleo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:27:08,447 - INFO - Sleeping: 2.999977 seconds
+2026-04-16 01:27:11,450 - INFO - Requesting page (first: True, try: 3): https://export.arxiv.org/api/query?search_query=desde+n%C3%BAcleo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:27:26,766 - WARNING - arXiv search failed for 'desde núcleo': Page request resulted in HTTP 429 (https://export.arxiv.org/api/query?search_query=desde+n%C3%BAcleo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100)
+2026-04-16 01:27:27,062 - WARNING - PubMed search failed for 'desde núcleo': Expecting value: line 1 column 1 (char 0)
+2026-04-16 01:27:28,574 - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=n%C3%BAcleo+ojos&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:27:28,786 - INFO - Sleeping: 2.999981 seconds
+2026-04-16 01:27:31,789 - INFO - Requesting page (first: True, try: 1): https://export.arxiv.org/api/query?search_query=n%C3%BAcleo+ojos&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:27:31,963 - INFO - Sleeping: 2.999980 seconds
+2026-04-16 01:27:34,966 - INFO - Requesting page (first: True, try: 2): https://export.arxiv.org/api/query?search_query=n%C3%BAcleo+ojos&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:27:35,417 - INFO - Sleeping: 2.999981 seconds
+2026-04-16 01:27:38,420 - INFO - Requesting page (first: True, try: 3): https://export.arxiv.org/api/query?search_query=n%C3%BAcleo+ojos&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:27:54,528 - WARNING - arXiv search failed for 'núcleo ojos': Page request resulted in HTTP 429 (https://export.arxiv.org/api/query?search_query=n%C3%BAcleo+ojos&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100)
+2026-04-16 01:27:54,810 - WARNING - PubMed search failed for 'núcleo ojos': Expecting value: line 1 column 1 (char 0)
+2026-04-16 01:27:56,271 - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:27:56,713 - INFO - Sleeping: 2.999984 seconds
+2026-04-16 01:27:59,717 - INFO - Requesting page (first: True, try: 1): https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:28:00,065 - INFO - Sleeping: 2.999981 seconds
+2026-04-16 01:28:03,068 - INFO - Requesting page (first: True, try: 2): https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:28:03,240 - INFO - Sleeping: 2.999978 seconds
+2026-04-16 01:28:06,243 - INFO - Requesting page (first: True, try: 3): https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:28:06,411 - WARNING - arXiv search failed for '*importada desde': Page request resulted in HTTP 429 (https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100)
+2026-04-16 01:28:06,813 - WARNING - PubMed search failed for '*importada desde': Expecting value: line 1 column 1 (char 0)
+2026-04-16 01:28:08,157 - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=nueva+perspectiva&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:28:08,365 - INFO - Sleeping: 2.999984 seconds
+2026-04-16 01:28:11,368 - INFO - Requesting page (first: True, try: 1): https://export.arxiv.org/api/query?search_query=nueva+perspectiva&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:28:26,986 - INFO - Sleeping: 2.999976 seconds
+2026-04-16 01:28:29,990 - INFO - Requesting page (first: True, try: 2): https://export.arxiv.org/api/query?search_query=nueva+perspectiva&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:28:30,152 - INFO - Sleeping: 2.999982 seconds
+2026-04-16 01:28:33,156 - INFO - Requesting page (first: True, try: 3): https://export.arxiv.org/api/query?search_query=nueva+perspectiva&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:28:33,314 - WARNING - arXiv search failed for 'nueva perspectiva': Page request resulted in HTTP 429 (https://export.arxiv.org/api/query?search_query=nueva+perspectiva&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100)
+2026-04-16 01:28:33,610 - WARNING - PubMed search failed for 'nueva perspectiva': Expecting value: line 1 column 1 (char 0)
+2026-04-16 01:28:35,022 - WARNING - Wikipedia search failed for 'alta': "Alta" may refer to: 
+Alta
+Alta
+Alta
+Alta
+Alta
+Loma Alta
+Cholpon-Alta
+Alto
+Alta Car and Engineering Company
+Alta médica
+Seguridad social
+American Literary Translators Association
+Wikcionario
+Wikcionario
+
+
+
+
+2026-04-16 01:28:35,022 - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=alta&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:28:35,210 - INFO - Sleeping: 2.999981 seconds
+2026-04-16 01:28:38,213 - INFO - Requesting page (first: True, try: 1): https://export.arxiv.org/api/query?search_query=alta&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:28:53,678 - INFO - Sleeping: 2.999974 seconds
+2026-04-16 01:28:56,681 - INFO - Requesting page (first: True, try: 2): https://export.arxiv.org/api/query?search_query=alta&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:29:07,440 - INFO - Sleeping: 2.999975 seconds
+2026-04-16 01:29:10,443 - INFO - Requesting page (first: True, try: 3): https://export.arxiv.org/api/query?search_query=alta&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:29:10,586 - WARNING - arXiv search failed for 'alta': Page request resulted in HTTP 429 (https://export.arxiv.org/api/query?search_query=alta&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100)
+2026-04-16 01:29:10,868 - WARNING - PubMed search failed for 'alta': Expecting value: line 1 column 1 (char 0)
+2026-04-16 01:29:12,288 - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:29:12,859 - INFO - Sleeping: 2.999980 seconds
+2026-04-16 01:29:15,862 - INFO - Requesting page (first: True, try: 1): https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:29:16,032 - INFO - Sleeping: 2.999979 seconds
+2026-04-16 01:29:19,035 - INFO - Requesting page (first: True, try: 2): https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:29:20,360 - INFO - Sleeping: 2.999977 seconds
+2026-04-16 01:29:23,363 - INFO - Requesting page (first: True, try: 3): https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-16 01:29:23,979 - WARNING - arXiv search failed for '*importada desde': Page request resulted in HTTP 429 (https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100)
+2026-04-16 01:29:24,252 - WARNING - PubMed search failed for '*importada desde': Expecting value: line 1 column 1 (char 0)
