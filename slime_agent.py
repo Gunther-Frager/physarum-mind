@@ -23,8 +23,13 @@ import random
 import glob
 import numpy as np
 import google.generativeai as genai
-from sentence_transformers import SentenceTransformer
 from datetime import datetime
+
+try:
+    from sentence_transformers import SentenceTransformer
+except ImportError as e:
+    print(f"⚠️  sentence-transformers no está instalado: {e}")
+    SentenceTransformer = None
 
 # Importar módulo de investigación
 try:
@@ -49,9 +54,80 @@ THRESHOLD_CONECTAR = 0.6                       # Olfato: similitud coseno mínim
 THRESHOLD_SINTESIS = 1.5                       # Crecimiento: fuerza mínima para crear síntesis
 
 # Inicializar modelos
-genai.configure(api_key=GEMINI_API_KEY)
-model_gemini = genai.GenerativeModel('gemini-1.5-flash')
-embed_model = SentenceTransformer(MODELO_EMBEDDING)
+model_gemini = None
+GEMINI_MODEL_NAME = None
+
+
+def list_gemini_models():
+    """Lista los modelos Gemini disponibles en el entorno actual."""
+    if hasattr(genai, 'list_models'):
+        try:
+            result = genai.list_models()
+            if hasattr(result, 'data'):
+                return [getattr(m, 'id', str(m)) for m in result.data]
+            return [getattr(m, 'id', str(m)) for m in result]
+        except Exception as e:
+            print(f"⚠️  No se pudo listar modelos con genai.list_models: {e}")
+    if hasattr(genai, 'models') and hasattr(genai.models, 'list'):
+        try:
+            result = genai.models.list()
+            if hasattr(result, 'data'):
+                return [getattr(m, 'id', str(m)) for m in result.data]
+            return [getattr(m, 'id', str(m)) for m in result]
+        except Exception as e:
+            print(f"⚠️  No se pudo listar modelos con genai.models.list: {e}")
+    return []
+
+
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+    available_models = list_gemini_models()
+    if available_models:
+        print(f"🔎 Modelos Gemini disponibles: {available_models[:10]}")
+    else:
+        print("⚠️  No se pudo determinar los modelos Gemini disponibles.")
+
+    for candidate in [
+        'gemini-1.5-flash',
+        'gemini-1.5',
+        'gpt-4.1-mini',
+        'text-bison-001',
+        'gemini-1.0',
+    ]:
+        if available_models and candidate not in available_models:
+            continue
+        try:
+            if hasattr(genai, 'GenerativeModel'):
+                model_gemini = genai.GenerativeModel(candidate)
+                GEMINI_MODEL_NAME = candidate
+                print(f"✅ Gemini cargado: {candidate}")
+                break
+        except Exception as e:
+            print(f"⚠️  Gemini no disponible para {candidate}: {e}")
+
+    if model_gemini is None and available_models:
+        fallback = available_models[0]
+        try:
+            if hasattr(genai, 'GenerativeModel'):
+                model_gemini = genai.GenerativeModel(fallback)
+                GEMINI_MODEL_NAME = fallback
+                print(f"✅ Gemini cargado por fallback: {fallback}")
+        except Exception as e:
+            print(f"⚠️  Fallback Gemini falló para {fallback}: {e}")
+
+    if model_gemini is None:
+        print("⚠️  No se pudo cargar ningún modelo Gemini con GenerativeModel.")
+else:
+    print("⚠️  GEMINI_API_KEY no configurada. Síntesis deshabilitada.")
+
+try:
+    if SentenceTransformer is not None:
+        embed_model = SentenceTransformer(MODELO_EMBEDDING)
+    else:
+        raise ImportError("sentence-transformers no disponible")
+except Exception as e:
+    print(f"⚠️  No se pudo cargar SentenceTransformer: {e}")
+    embed_model = None
 
 
 # ==================== UTILIDADES ====================
@@ -146,12 +222,49 @@ def sintetizar_idea(nota_a_nombre, nota_a_cont, nota_b_nombre, nota_b_cont):
     
     Devuelve solo el texto de la nota, sin introducciones.
     """
-    try:
-        response = model_gemini.generate_content(prompt)
-        return response.text
-    except Exception as e:
-        print(f"⚠️  Error en Gemini al sintetizar: {e}")
-        return None
+    # Intentar método clásico si el modelo está disponible
+    if model_gemini is not None:
+        if hasattr(model_gemini, 'generate_content'):
+            try:
+                response = model_gemini.generate_content(prompt)
+                return getattr(response, 'text', None)
+            except Exception as e:
+                print(f"⚠️  Error en Gemini con GenerativeModel.generate_content ({GEMINI_MODEL_NAME}): {e}")
+        elif hasattr(model_gemini, 'generate'):
+            try:
+                response = model_gemini.generate(prompt)
+                return getattr(response, 'text', None) or getattr(response, 'output', None)
+            except Exception as e:
+                print(f"⚠️  Error en Gemini con GenerativeModel.generate ({GEMINI_MODEL_NAME}): {e}")
+
+    # Fallback: intentar generate_text si está disponible
+    if hasattr(genai, 'generate_text'):
+        try:
+            result = genai.generate_text(model=GEMINI_MODEL_NAME or 'gpt-4.1-mini', prompt=prompt)
+            text = getattr(result, 'text', None)
+            if not text and hasattr(result, 'output'):
+                output = getattr(result, 'output')
+                if isinstance(output, list) and output:
+                    text = getattr(output[0], 'content', None) or str(output[0])
+            return text or result
+        except Exception as e:
+            print(f"⚠️  Error en Gemini con generate_text ({GEMINI_MODEL_NAME or 'gpt-4.1-mini'}): {e}")
+
+    # Fallback adicional: intentar generate si existe
+    if hasattr(genai, 'generate'):
+        try:
+            result = genai.generate(model=GEMINI_MODEL_NAME or 'gpt-4.1-mini', prompt=prompt)
+            text = getattr(result, 'text', None)
+            if not text and hasattr(result, 'output'):
+                output = getattr(result, 'output')
+                if isinstance(output, list) and output:
+                    text = getattr(output[0], 'content', None) or str(output[0])
+            return text or result
+        except Exception as e:
+            print(f"⚠️  Error en Gemini con generate ({GEMINI_MODEL_NAME or 'gpt-4.1-mini'}): {e}")
+
+    print("⚠️  No se pudo generar síntesis con Gemini: ningún método válido disponible.")
+    return None
 
 
 # ==================== CICLO PRINCIPAL ====================
@@ -187,6 +300,10 @@ def ejecutar_agente():
     if len(notas) < 2:
         print("⚠️  Necesitas al menos 2 notas para generar conexiones.")
         print("   Añade notas a /notas/*.md o crea issues cuyo label sea 'idea'")
+        return
+    
+    if embed_model is None:
+        print("⚠️  No se pudo cargar el modelo de embeddings. El ciclo no puede continuar.")
         return
     
     grafo = cargar_grafo()

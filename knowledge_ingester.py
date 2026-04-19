@@ -46,22 +46,21 @@ try:
     import arxiv
     import requests
     from bs4 import BeautifulSoup
-except ImportError:
-    print("⚠️  Instalando dependencias de knowledge_ingester...")
-    os.system("pip install wikipedia arxiv requests beautifulsoup4")
-    import wikipedia
-    import arxiv
-    import requests
-    from bs4 import BeautifulSoup
+except ImportError as e:
+    print(f"⚠️  No se pudieron importar dependencias de knowledge_ingester: {e}")
+    wikipedia = None
+    arxiv = None
+    requests = None
+    BeautifulSoup = None
 
 try:
     from sentence_transformers import SentenceTransformer, util
     import torch
-except ImportError:
-    print("⚠️  Reinstalando sentence-transformers...")
-    os.system("pip install sentence-transformers torch")
-    from sentence_transformers import SentenceTransformer, util
-    import torch
+except ImportError as e:
+    print(f"⚠️  sentence-transformers no está instalado: {e}")
+    SentenceTransformer = None
+    util = None
+    torch = None
 
 
 # ==================== CONFIGURACIÓN CENTRALIZADA ====================
@@ -133,6 +132,8 @@ print("="*60 + "\n")
 # ==================== INICIALIZACIÓN DE MODELOS ====================
 
 try:
+    if SentenceTransformer is None:
+        raise ImportError("sentence-transformers no disponible")
     embed_model = SentenceTransformer('all-MiniLM-L6-v2')
     EMBEDDINGS_AVAILABLE = True
 except Exception as e:
@@ -321,6 +322,9 @@ def search_wikipedia(query: str) -> Optional[Dict]:
     Retorna:
         dict: {title, url, summary, relevance_score} o None
     """
+    if wikipedia is None:
+        logging.warning("Wikipedia no está disponible. Saltando búsqueda en Wikipedia.")
+        return None
     try:
         # Configurar idioma español
         wikipedia.set_lang("es")
@@ -354,6 +358,9 @@ def search_arxiv(query: str) -> List[Dict]:
         List[dict]: Hasta LIMIT_RESULTS_PER_SOURCE papers
     """
     results = []
+    if arxiv is None:
+        logging.warning("arXiv no está disponible. Saltando búsqueda en arXiv.")
+        return results
     try:
         client = arxiv.Client()
         
@@ -390,6 +397,9 @@ def search_pubmed(query: str) -> List[Dict]:
         List[dict]: Hasta LIMIT_RESULTS_PER_SOURCE artículos
     """
     results = []
+    if requests is None or BeautifulSoup is None:
+        logging.warning("Requests o BeautifulSoup no están disponibles. Saltando búsqueda en PubMed.")
+        return results
     try:
         # PubMed E-utilities API (sin clave requerida)
         search_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
@@ -456,6 +466,9 @@ def search_newsapi(query: str) -> List[Dict]:
     Retorna:
         List[dict]: Hasta LIMIT_RESULTS_PER_SOURCE artículos
     """
+    if requests is None:
+        logging.warning("Requests no está disponible. Saltando búsqueda en NewsAPI.")
+        return []
     if not NEWSAPI_KEY:
         logging.debug("NEWSAPI_KEY no configurada. Saltando búsqueda en NewsAPI.")
         return []
