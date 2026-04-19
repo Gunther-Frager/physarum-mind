@@ -6508,3 +6508,109 @@ Wikcionario
 2026-04-18 23:27:25,622 - INFO - Requesting page (first: True, try: 3): https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
 2026-04-18 23:27:25,943 - WARNING - arXiv search failed for '*importada desde': Page request resulted in HTTP 500 (https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100)
 2026-04-18 23:27:26,229 - WARNING - PubMed search failed for '*importada desde': Expecting value: line 1 column 1 (char 0)
+2026-04-19 01:29:24,871 - INFO - No device provided, using cpu
+2026-04-19 01:29:24,950 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-19 01:29:24,956 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/modules.json "HTTP/1.1 200 OK"
+2026-04-19 01:29:25,034 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-19 01:29:25,040 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-04-19 01:29:25,040 - INFO - Loading SentenceTransformer model from sentence-transformers/all-MiniLM-L6-v2.
+2026-04-19 01:29:25,120 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-19 01:29:25,126 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-04-19 01:29:25,202 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-04-19 01:29:25,208 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/README.md "HTTP/1.1 200 OK"
+2026-04-19 01:29:25,285 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-19 01:29:25,291 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/modules.json "HTTP/1.1 200 OK"
+2026-04-19 01:29:25,373 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-19 01:29:25,379 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-04-19 01:29:25,458 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+2026-04-19 01:29:25,537 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-19 01:29:25,542 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/config.json "HTTP/1.1 200 OK"
+2026-04-19 01:29:25,596 - WARNING - [1mBertModel LOAD REPORT[0m from: sentence-transformers/all-MiniLM-L6-v2
+Key                     | Status     |  | 
+------------------------+------------+--+-
+embeddings.position_ids | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+2026-04-19 01:29:25,679 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-04-19 01:29:25,781 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/preprocessor_config.json "HTTP/1.1 404 Not Found"
+2026-04-19 01:29:25,873 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/video_preprocessor_config.json "HTTP/1.1 404 Not Found"
+2026-04-19 01:29:25,959 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/preprocessor_config.json "HTTP/1.1 404 Not Found"
+2026-04-19 01:29:26,046 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-19 01:29:26,052 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-04-19 01:29:26,142 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-19 01:29:26,147 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/config.json "HTTP/1.1 200 OK"
+2026-04-19 01:29:26,233 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-19 01:29:26,238 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/config.json "HTTP/1.1 200 OK"
+2026-04-19 01:29:26,318 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-19 01:29:26,325 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-04-19 01:29:26,405 - INFO - HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/all-MiniLM-L6-v2/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-04-19 01:29:26,489 - INFO - HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/all-MiniLM-L6-v2/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-04-19 01:29:26,601 - INFO - HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-19 01:29:26,607 - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-04-19 01:29:26,702 - INFO - HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/all-MiniLM-L6-v2 "HTTP/1.1 200 OK"
+2026-04-19 01:29:27,675 - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=desde+n%C3%BAcleo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:29:27,965 - INFO - Sleeping: 2.999941 seconds
+2026-04-19 01:29:30,969 - INFO - Requesting page (first: True, try: 1): https://export.arxiv.org/api/query?search_query=desde+n%C3%BAcleo&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:30:15,855 - INFO - Got first page: 22 of 22 total results
+2026-04-19 01:30:25,350 - WARNING - PubMed search failed for 'desde núcleo': Expecting value: line 1 column 1 (char 0)
+2026-04-19 01:30:26,475 - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=n%C3%BAcleo+ojos&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:30:52,353 - INFO - Sleeping: 2.999974 seconds
+2026-04-19 01:30:55,356 - INFO - Requesting page (first: True, try: 1): https://export.arxiv.org/api/query?search_query=n%C3%BAcleo+ojos&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:30:56,004 - INFO - Sleeping: 2.999973 seconds
+2026-04-19 01:30:59,007 - INFO - Requesting page (first: True, try: 2): https://export.arxiv.org/api/query?search_query=n%C3%BAcleo+ojos&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:30:59,151 - INFO - Sleeping: 2.999977 seconds
+2026-04-19 01:31:02,154 - INFO - Requesting page (first: True, try: 3): https://export.arxiv.org/api/query?search_query=n%C3%BAcleo+ojos&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:31:02,338 - WARNING - arXiv search failed for 'núcleo ojos': Page request resulted in HTTP 429 (https://export.arxiv.org/api/query?search_query=n%C3%BAcleo+ojos&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100)
+2026-04-19 01:31:02,621 - WARNING - PubMed search failed for 'núcleo ojos': Expecting value: line 1 column 1 (char 0)
+2026-04-19 01:31:03,547 - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:31:03,851 - INFO - Sleeping: 2.999973 seconds
+2026-04-19 01:31:06,855 - INFO - Requesting page (first: True, try: 1): https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:31:07,554 - INFO - Sleeping: 2.999975 seconds
+2026-04-19 01:31:10,557 - INFO - Requesting page (first: True, try: 2): https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:31:10,756 - INFO - Sleeping: 2.999940 seconds
+2026-04-19 01:31:13,759 - INFO - Requesting page (first: True, try: 3): https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:31:13,958 - WARNING - arXiv search failed for '*importada desde': Page request resulted in HTTP 429 (https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100)
+2026-04-19 01:31:14,229 - WARNING - PubMed search failed for '*importada desde': Expecting value: line 1 column 1 (char 0)
+2026-04-19 01:31:15,040 - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=nueva+perspectiva&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:31:15,843 - INFO - Sleeping: 2.999976 seconds
+2026-04-19 01:31:18,846 - INFO - Requesting page (first: True, try: 1): https://export.arxiv.org/api/query?search_query=nueva+perspectiva&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:31:18,988 - INFO - Sleeping: 2.999975 seconds
+2026-04-19 01:31:21,990 - INFO - Requesting page (first: True, try: 2): https://export.arxiv.org/api/query?search_query=nueva+perspectiva&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:31:22,668 - INFO - Sleeping: 2.999974 seconds
+2026-04-19 01:31:25,671 - INFO - Requesting page (first: True, try: 3): https://export.arxiv.org/api/query?search_query=nueva+perspectiva&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:31:39,872 - INFO - Got first page: 27 of 27 total results
+2026-04-19 01:31:49,172 - WARNING - PubMed search failed for 'nueva perspectiva': Expecting value: line 1 column 1 (char 0)
+2026-04-19 01:31:50,289 - WARNING - Wikipedia search failed for 'alta': "Alta" may refer to: 
+Alta
+Alta
+Alta
+Alta
+Alta
+Loma Alta
+Cholpon-Alta
+Alto
+Alta Car and Engineering Company
+Alta médica
+Seguridad social
+American Literary Translators Association
+Wikcionario
+Wikcionario
+
+
+
+
+2026-04-19 01:31:50,290 - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=alta&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:31:50,478 - INFO - Sleeping: 2.999973 seconds
+2026-04-19 01:31:53,481 - INFO - Requesting page (first: True, try: 1): https://export.arxiv.org/api/query?search_query=alta&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:32:06,922 - INFO - Got first page: 79 of 79 total results
+2026-04-19 01:32:16,209 - WARNING - PubMed search failed for 'alta': Expecting value: line 1 column 1 (char 0)
+2026-04-19 01:32:17,202 - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:32:48,276 - INFO - Sleeping: 2.999933 seconds
+2026-04-19 01:32:51,279 - INFO - Requesting page (first: True, try: 1): https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:33:21,982 - INFO - Sleeping: 2.999976 seconds
+2026-04-19 01:33:24,985 - INFO - Requesting page (first: True, try: 2): https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:33:25,339 - INFO - Sleeping: 2.999933 seconds
+2026-04-19 01:33:28,342 - INFO - Requesting page (first: True, try: 3): https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2026-04-19 01:33:28,487 - WARNING - arXiv search failed for '*importada desde': Page request resulted in HTTP 429 (https://export.arxiv.org/api/query?search_query=%2Aimportada+desde&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100)
+2026-04-19 01:33:28,758 - WARNING - PubMed search failed for '*importada desde': Expecting value: line 1 column 1 (char 0)
